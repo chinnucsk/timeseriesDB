@@ -1,0 +1,43 @@
+#!/bin/bash
+
+BIN_DIR=`dirname $0`
+cd $BIN_DIR/..
+PWD=`pwd`
+HOSTNAME=`hostname`
+NODENAME="tsdb@$HOSTNAME"
+STOP_NODENAME="stop_$NODENAME"
+SHELL_NODENAME="shell_$NODENAME"
+REMSH_NODENAME="remsh_$NODENAME"
+
+case "$1" in
+    'make')
+	erl -eval "make:all(), halt()."
+	echo ""
+	;;
+    'clean')
+	rm ebin/*.beam
+	;;
+    'clean-emacs')
+	find -name "*~" | xargs rm
+	;;
+    'start')
+	erl -noshell -detached -name $NODENAME -shutdown_time 10000 +P 10000000
+	;;
+    'stop')
+	erl -noshell -sname $STOP_NODENAME -eval "rpc:call($NODENAME, init, stop, []), halt()."
+	;;
+    'shell')
+	erl -sname $SHELL_NODENAME
+	;;
+    'remsh')
+	erl -sname $REMSH_NODENAME -remsh $NODENAME
+	;;
+    'status')
+	epmd -names
+	;;
+    *)
+	echo "$> tsdb  [ make | start | stop | shell | remsh | status ]"
+	;;
+esac
+exit 0
+
