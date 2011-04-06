@@ -21,7 +21,9 @@ case "$1" in
 	find -name "*~" | xargs rm
 	;;
     'start')
-	erl -noshell -detached -name $NODENAME -shutdown_time 10000 +P 10000000
+#	echo "erl -pa $PWD/ebin -name $NODENAME -shutdown_time 10000 +P 10000000 -eval \"tsdb:start().\""
+	erl -pa $PWD/ebin -name $NODENAME -shutdown_time 10000 +P 10000000 -eval "tsdb:start()."
+#	erl -pa $PWD/ebin -noshell -detached -name $NODENAME -shutdown_time 10000 +P 10000000 -eval "tsdb:start()."
 	;;
     'stop')
 	erl -noshell -sname $STOP_NODENAME -eval "rpc:call($NODENAME, init, stop, []), halt()."
