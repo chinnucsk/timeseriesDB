@@ -1,0 +1,8 @@
+#!/bin/bash
+
+CMD_DIR=`dirname $0`
+cd $CMD_DIR/
+PWD=`pwd`
+
+echo "erl -pa $PWD/ebin -boot start_sasl -s tsdb"-
+erl -pa $PWD/ebin -boot start_sasl -s tsdb

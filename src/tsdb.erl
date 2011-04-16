@@ -13,7 +13,7 @@ ensure_started(App) ->
 
 start() ->
     ensure_started(crypto),
-    application:start(tsdb).
+    application:start(timeseriesDB).
 
 stop() ->
-    application:stop(tsdb).
+    application:stop(timeseriesDB).
