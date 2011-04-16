@@ -23,7 +23,7 @@ init([]) ->
 web_specs(Mod, Port) ->
     WebConfig = [{ip, {127,0,0,1}},
                  {port, Port},
-                 {docroot, code:priv_dir(tsdb) ++ "/www/"}],
+                 {docroot, code:priv_dir(timeseriesDB) ++ "/www/"}],
     {Mod,
      {Mod, start, [WebConfig]},
      permanent, 5000, worker, dynamic}.
