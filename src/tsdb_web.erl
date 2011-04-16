@@ -28,6 +28,7 @@ loop(Req, DocRoot) ->
 			Req:ok({"text/javascript",
 				mochijson2:encode({struct, [{<<"test">>, 42}]})});
 		    _ ->
+			error_logger:info_msg("Serving file: ~p", [Path]),
                         Req:serve_file(Path, DocRoot)
                 end;
             'POST' ->
