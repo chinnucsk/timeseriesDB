@@ -1,3 +1,6 @@
+%% @author Peter Mechlenborg <peter.mechlenborg@gmail.com>
+%%
+%% @doc This is the main module for the timeseriesDB application.
 
 -module(tsdb).
 
@@ -18,5 +21,8 @@ start() ->
 stop() ->
     application:stop(timeseriesDB).
 
+%% @doc Function uses for testing the devopment setup.  Will be
+%% removed when we get some real tests.
+-spec foo() -> 42.
 foo() ->
     42.
