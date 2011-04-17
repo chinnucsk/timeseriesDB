@@ -7,7 +7,8 @@
 	     tsdb,
 	     tsdb_app,
 	     tsdb_sup,
-	     tsdb_web
+	     tsdb_web,
+	     tsdb_storage_lib
 	    ]},
   {registered, []},
   {mod, {'tsdb_app', []}},
