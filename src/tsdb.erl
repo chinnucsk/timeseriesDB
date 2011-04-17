@@ -1,7 +1,7 @@
 
 -module(tsdb).
 
--export([start/0, stop/0]).
+-export([start/0, stop/0, foo/0]).
 
 ensure_started(App) ->
     case application:start(App) of
@@ -17,3 +17,6 @@ start() ->
 
 stop() ->
     application:stop(timeseriesDB).
+
+foo() ->
+    42.
