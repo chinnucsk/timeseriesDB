@@ -17,5 +17,5 @@ write(Value) ->
     write(convert_to_unix_time(erlang:now()), Value).
 
 
-log(Val, Reason) ->
+log(_Val, Reason) ->
     Reason.
