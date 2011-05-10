@@ -38,6 +38,7 @@ tmp_file(Name) ->
     tmp_dir() ++ Name.
 
 with_tmp_file(Name, Fun) ->
+    filelib:ensure_dir(tmp_dir()),
     Tmp = tmp_file(Name),
     {setup,
      fun() -> Tmp end,
