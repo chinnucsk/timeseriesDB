@@ -6,6 +6,7 @@
 %% A timeseries is a sequence af timestamp, value pairs, where values
 %% must be floats.
 
+
 -module(tsdb_storage_lib).
 -export([open_timeseries_file/1,
 	 add_value/2,

@@ -2,8 +2,6 @@
 
 -module(tsdb_web).
 
--include_lib("epgsql/include/pgsql.hrl").
-
 -export([start/1, stop/0, loop/2]).
 
 %% External API
