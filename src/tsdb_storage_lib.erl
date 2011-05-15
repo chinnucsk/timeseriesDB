@@ -22,9 +22,12 @@
 %% @doc Opens or creates a timeseries.  If file exists it is opened so
 %% more data can be appended to the timeseries.  If the file does not
 %% exist, it is created and opened.
--spec open_timeseries_file(filename()) -> timeseries_descriptor() | not_implemented.
+-spec open_timeseries_file(filename()) -> timeseries_descriptor().
 open_timeseries_file(_Filename) ->
-    not_implemented.
+    case file:open(_Filename, [append]) of 
+	{ok, WriteDescr} ->
+	    WriteDescr
+	end.
 
 %% @doc Similar to add_value/3, but Timestamp defaults to now.
 %%
