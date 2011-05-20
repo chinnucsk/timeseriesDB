@@ -7,7 +7,7 @@ open_timeseries_file_test_() ->
       "aha1.ts",
       fun(File) ->
 	      ?cmd("touch " ++ File),
-	      ?assertMatch(not_implemented, tsdb_storage_lib:open_timeseries_file(File))
+	      ?assertMatch({ok,_}, tsdb_storage_lib:open_timeseries_file(File))
       end).
 
 add_value_test_() ->
