@@ -7,7 +7,19 @@ open_timeseries_file_test_() ->
       "aha1.ts",
       fun(File) ->
 	      ?cmd("touch " ++ File),
-	      ?assertMatch({ok,_}, tsdb_storage_lib:open_timeseries_file(File))
+	      ?assertMatch({ok,_}, tsdb_storage_lib:open_timeseries_file(File)),
+	      ?cmd("rm " ++ File)
+      end).
+
+open_timeseries_file_fail_write_protected_test_() ->
+    with_tmp_file(
+      "write_protected.ts", 
+      fun(File) ->
+	      ?cmd("touch " ++ File),
+	      ?cmd("chmod ugo-w " ++ File),
+	      ?assertMatch({error,_}, tsdb_storage_lib:open_timeseries_file(File)),
+	      ?cmd("chmod ugo+w " ++ File),
+	      ?cmd("rm " ++ File)
       end).
 
 add_value_test_() ->

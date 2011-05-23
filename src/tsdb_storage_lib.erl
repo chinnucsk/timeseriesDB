@@ -26,7 +26,9 @@
 open_timeseries_file(_Filename) ->
     case file:open(_Filename, [append]) of 
 	{ok, WriteDescr} ->
-	    {ok, WriteDescr}
+	    {ok, WriteDescr};
+	{error, Reason} ->
+	    {error, Reason}
 	end.
 
 %% @doc Similar to add_value/3, but Timestamp defaults to now.
