@@ -35,14 +35,19 @@ open_timeseries_file(_Filename) ->
 %%
 %% @see add_value/3.
 -spec add_value(timeseries_descriptor(), ts_value()) -> ok | {error, term()} | not_implemented.
-add_value(_Timeseries, _Value) ->
-    not_implemented.
+add_value(_Timeseries, _Value) -> 
+    case file:write(_Timeseries, float_to_list(_Value)) of %% <- maybe write the timestamp in the file as well???
+	{ok} ->
+	    ok;
+	{error} ->
+	    {error, 'write failed'}
+    end.							   
 
 %% @doc Add a value to a timeseries.  Timestamp must be older than the
 %% last value already in the timeseries.
--spec add_value(timeseries_descriptor(), ts_value(), timestamp()) -> ok | {error, term()} | not_implemented.
+-spec add_value(timeseries_descriptor(), ts_value(), timestamp()) -> ok | {error, term()}.
 add_value(_Timeseries, _Value, _Timestamp) ->
-    not_implemented.
+    true.
 
 %% @doc Retrives all values from a timeseries in interval, including
 %% From and To.
@@ -50,7 +55,6 @@ add_value(_Timeseries, _Value, _Timestamp) ->
 		 timestamp() | first_entry,
 		 timestamp() | last_entry) ->
 			timeseries() |
-			{error, term()} |
-			not_implemented.
+			{error, term()}.
 get_values(_Timeseries, _From, _To) ->
-    not_implemented.
+   true.
