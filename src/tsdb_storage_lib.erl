@@ -36,11 +36,11 @@ open_timeseries_file(_Filename) ->
 %% @see add_value/3.
 -spec add_value(timeseries_descriptor(), ts_value()) -> ok | {error, term()} | not_implemented.
 add_value(_Timeseries, _Value) -> 
-    case file:write(_Timeseries, float_to_list(_Value)) of %% <- maybe write the timestamp in the file as well???
-	{ok} ->
+    case file:write(_Timeseries,  format_entry(erlang:now(), _Value)) of
+	ok ->
 	    ok;
-	{error} ->
-	    {error, 'write failed'}
+	{error, BadArg} ->
+	    {error, 'write failed', BadArg, _Timeseries}
     end.							   
 
 %% @doc Add a value to a timeseries.  Timestamp must be older than the
@@ -57,4 +57,10 @@ add_value(_Timeseries, _Value, _Timestamp) ->
 			timeseries() |
 			{error, term()}.
 get_values(_Timeseries, _From, _To) ->
-   true.
+   not_implemented.
+
+format_entry(_Time, _Value) when is_float(_Value) -> 
+    float_to_list(_Value);
+format_entry(_Time, _Value) when is_atom(_Value) -> 
+    atom_to_list(_Value).
+    

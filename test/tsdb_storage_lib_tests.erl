@@ -27,7 +27,9 @@ add_value_test_() ->
       "aha2.ts",
       fun(File) ->
 	      ?cmd("touch " ++ File),
-	      ?assertMatch(not_implemented, tsdb_storage_lib:add_value("foo", etu))
+	      {Result, _Timeseries} = tsdb_storage_lib:open_timeseries_file(File),
+	      ?assertMatch(ok, Result),
+	      ?assertMatch(ok, tsdb_storage_lib:add_value(_Timeseries, eto))
       end).
 
 get_values_test_() ->
