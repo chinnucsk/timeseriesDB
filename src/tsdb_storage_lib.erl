@@ -24,24 +24,14 @@
 %% exist, it is created and opened.
 -spec open_timeseries_file(filename()) -> timeseries_descriptor().
 open_timeseries_file(_Filename) ->
-    case file:open(_Filename, [append]) of 
-	{ok, WriteDescr} ->
-	    {ok, WriteDescr};
-	{error, Reason} ->
-	    {error, Reason}
-	end.
+    file:open(_Filename, [append]).
 
 %% @doc Similar to add_value/3, but Timestamp defaults to now.
 %%
 %% @see add_value/3.
 -spec add_value(timeseries_descriptor(), ts_value()) -> ok | {error, term()} | not_implemented.
 add_value(_Timeseries, _Value) -> 
-    case file:write(_Timeseries,  format_entry(erlang:now(), _Value)) of
-	ok ->
-	    ok;
-	{error, BadArg} ->
-	    {error, 'write failed', BadArg, _Timeseries}
-    end.							   
+    file:write(_Timeseries,  format_entry(erlang:now(), _Value)).
 
 %% @doc Add a value to a timeseries.  Timestamp must be older than the
 %% last value already in the timeseries.
@@ -60,7 +50,11 @@ get_values(_Timeseries, _From, _To) ->
    not_implemented.
 
 format_entry(_Time, _Value) when is_float(_Value) -> 
-    float_to_list(_Value);
+    format_time(_Time) ++ " " ++ float_to_list(_Value) ++ "\r\n";
 format_entry(_Time, _Value) when is_atom(_Value) -> 
-    atom_to_list(_Value).
+    format_time(_Time) ++ " " ++ atom_to_list(_Value) ++ "\r\n". 
+
+format_time({_MegaSecs, _Secs, _MicroSecs}) ->
+    "{" ++ integer_to_list(_MegaSecs) ++ "," ++ integer_to_list(_Secs) ++ "," ++ integer_to_list(_MicroSecs) ++ "}".
+    
     
