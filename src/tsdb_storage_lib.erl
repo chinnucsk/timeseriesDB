@@ -49,12 +49,8 @@ add_value(_Timeseries, _Value, _Timestamp) ->
 get_values(_Timeseries, _From, _To) ->
    not_implemented.
 
-format_entry(_Time, _Value) when is_float(_Value) -> 
-    format_time(_Time) ++ " " ++ float_to_list(_Value) ++ "\r\n";
-format_entry(_Time, _Value) when is_atom(_Value) -> 
-    format_time(_Time) ++ " " ++ atom_to_list(_Value) ++ "\r\n". 
+format_entry(_Time, _Value)  -> 
+    lists:flatten([io_lib:format("~p ", [_Time]), 
+		   io_lib:format("~p~n", [_Value])]).
 
-format_time({_MegaSecs, _Secs, _MicroSecs}) ->
-    "{" ++ integer_to_list(_MegaSecs) ++ "," ++ integer_to_list(_Secs) ++ "," ++ integer_to_list(_MicroSecs) ++ "}".
-    
     
