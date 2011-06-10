@@ -33,11 +33,11 @@ open_timeseries_file(_Filename) ->
 add_value(_Timeseries, _Value) -> 
     file:write(_Timeseries,  format_entry(erlang:now(), _Value)).
 
-%% @doc Add a value to a timeseries.  Timestamp must be older than the
+%% @doc Add a value to a timeseries.  Timestamp must be more recent than the
 %% last value already in the timeseries.
 -spec add_value(timeseries_descriptor(), ts_value(), timestamp()) -> ok | {error, term()}.
 add_value(_Timeseries, _Value, _Timestamp) ->
-    true.
+    file:write(_Timeseries,  format_entry(_Timestamp, _Value)).
 
 %% @doc Retrives all values from a timeseries in interval, including
 %% From and To.
