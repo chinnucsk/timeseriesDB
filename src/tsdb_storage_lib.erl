@@ -50,7 +50,6 @@ get_values(_Timeseries, _From, _To) ->
    not_implemented.
 
 format_entry(_Time, _Value)  -> 
-    lists:flatten([io_lib:format("~p ", [_Time]), 
-		   io_lib:format("~p~n", [_Value])]).
+    lists:flatten(io_lib:format("~p ~p~n", [_Time, _Value])).
 
     
