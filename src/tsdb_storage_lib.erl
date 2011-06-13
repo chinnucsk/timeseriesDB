@@ -11,8 +11,7 @@
 -export([open_timeseries_file/1,
 	 add_value/2,
 	 add_value/3,
-	 get_values/3,
-	parse_entry_from_line/1]).
+	 get_values/3]).
 
 -type filename() :: string().
 -type timeseries_descriptor() :: term().

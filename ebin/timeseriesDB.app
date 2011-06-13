@@ -3,7 +3,6 @@
  [{description, "timeseriesDB"},
   {vsn, "0.1"},
   {modules, [
-	     timestampwriter,
 	     tsdb,
 	     tsdb_app,
 	     tsdb_sup,
