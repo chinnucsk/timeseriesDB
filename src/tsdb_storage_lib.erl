@@ -11,7 +11,8 @@
 -export([open_timeseries_file/1,
 	 add_value/2,
 	 add_value/3,
-	 get_values/3]).
+	 get_values/3,
+	parse_entry_from_line/1]).
 
 -type filename() :: string().
 -type timeseries_descriptor() :: term().
@@ -51,5 +52,9 @@ get_values(_Timeseries, _From, _To) ->
 
 format_entry(_Time, _Value)  -> 
     lists:flatten(io_lib:format("~p ~p~n", [_Time, _Value])).
+
+parse_entry_from_line(Line) ->
+    [MegaSecs, Secs, Microsecs, Value] = string:tokens(Line, "{} ,"),
+    {ok, {list_to_integer(MegaSecs),list_to_integer(Secs), list_to_integer(Microsecs)}, Value}.
 
     
