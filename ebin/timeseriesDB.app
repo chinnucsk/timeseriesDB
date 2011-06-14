@@ -7,7 +7,7 @@
 	     tsdb_app,
 	     tsdb_sup,
 	     tsdb_web,
-	     tsdb_storage_lib,
+	     tsdb_file_storage,
 	     tsdb_ram_storage
 	    ]},
   {registered, []},

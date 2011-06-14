@@ -1,4 +1,4 @@
--module(tsdb_storage_lib_tests).
+-module(tsdb_file_storage_tests).
 
 -include_lib("eunit/include/eunit.hrl").
 
@@ -7,7 +7,7 @@ open_timeseries_file_test_() ->
       "aha1.ts",
       fun(File) ->
 	      ?cmd("touch " ++ File),
-	      ?assertMatch({ok,_}, tsdb_storage_lib:open_timeseries_file(File)),
+	      ?assertMatch({ok,_}, tsdb_file_storage:open_timeseries_file(File)),
 	      ?cmd("rm " ++ File)
       end).
 
@@ -17,7 +17,7 @@ open_timeseries_file_fail_write_protected_test_() ->
       fun(File) ->
 	      ?cmd("touch " ++ File),
 	      ?cmd("chmod ugo-w " ++ File),
-	      ?assertMatch({error,_}, tsdb_storage_lib:open_timeseries_file(File)),
+	      ?assertMatch({error,_}, tsdb_file_storage:open_timeseries_file(File)),
 	      ?cmd("chmod ugo+w " ++ File),
 	      ?cmd("rm " ++ File)
       end).
@@ -27,9 +27,9 @@ add_value_test_() ->
       "aha2.ts",
       fun(File) ->
 	      ?cmd("touch " ++ File),
-	      {Result, _Timeseries} = tsdb_storage_lib:open_timeseries_file(File),
+	      {Result, _Timeseries} = tsdb_file_storage:open_timeseries_file(File),
 	      ?assertMatch(ok, Result),
-	      ?assertMatch(ok, tsdb_storage_lib:add_value(_Timeseries, eto))
+	      ?assertMatch(ok, tsdb_file_storage:add_value(_Timeseries, eto))
       end).
 
 get_values_test_() ->
@@ -37,7 +37,7 @@ get_values_test_() ->
       "aha3.ts",
       fun(File) ->
 	      ?cmd("touch " ++ File),
-	      ?assertMatch(not_implemented, tsdb_storage_lib:get_values("foo", oetn, ste))
+	      ?assertMatch(not_implemented, tsdb_file_storage:get_values("foo", oetn, ste))
       end).
 
 

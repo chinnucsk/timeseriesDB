@@ -7,7 +7,7 @@
 %% must be floats.
 
 
--module(tsdb_storage_lib).
+-module(tsdb_file_storage).
 -export([open_timeseries_file/1,
 	 add_value/2,
 	 add_value/3,
@@ -23,21 +23,21 @@
 %% more data can be appended to the timeseries.  If the file does not
 %% exist, it is created and opened.
 -spec open_timeseries_file(filename()) -> timeseries_descriptor().
-open_timeseries_file(_Filename) ->
-    file:open(_Filename, [append]).
+open_timeseries_file(Filename) ->
+    file:open(Filename, [append]).
 
 %% @doc Similar to add_value/3, but Timestamp defaults to now.
 %%
 %% @see add_value/3.
 -spec add_value(timeseries_descriptor(), ts_value()) -> ok | {error, term()} | not_implemented.
-add_value(_Timeseries, _Value) -> 
-    file:write(_Timeseries,  format_entry(erlang:now(), _Value)).
+add_value(Timeseries, Value) -> 
+    file:write(Timeseries,  format_entry(erlang:now(), Value)).
 
 %% @doc Add a value to a timeseries.  Timestamp must be more recent than the
 %% last value already in the timeseries.
 -spec add_value(timeseries_descriptor(), ts_value(), timestamp()) -> ok | {error, term()}.
-add_value(_Timeseries, _Value, _Timestamp) ->
-    file:write(_Timeseries,  format_entry(_Timestamp, _Value)).
+add_value(Timeseries, Value, Timestamp) ->
+    file:write(Timeseries,  format_entry(Timestamp, Value)).
 
 %% @doc Retrives all values from a timeseries in interval, including
 %% From and To.
@@ -49,8 +49,8 @@ add_value(_Timeseries, _Value, _Timestamp) ->
 get_values(_Timeseries, _From, _To) ->
    not_implemented.
 
-format_entry(_Time, _Value)  -> 
-    lists:flatten(io_lib:format("~p ~p~n", [_Time, _Value])).
+format_entry(Time, Value)  -> 
+    lists:flatten(io_lib:format("~p ~p~n", [Time, Value])).
 
 parse_entry_from_line(Line) ->
     [MegaSecs, Secs, Microsecs, Value] = string:tokens(Line, "{} ,"),
