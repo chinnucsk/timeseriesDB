@@ -23,21 +23,21 @@
 %% more data can be appended to the timeseries.  If the file does not
 %% exist, it is created and opened.
 -spec open_timeseries_file(filename()) -> timeseries_descriptor().
-open_timeseries_file(Filename) ->
-    file:open(Filename, [append]).
+open_timeseries_file(Filename) -> 
+    {ok, start(Filename)}.
 
 %% @doc Similar to add_value/3, but Timestamp defaults to now.
 %%
 %% @see add_value/3.
 -spec add_value(timeseries_descriptor(), ts_value()) -> ok | {error, term()} | not_implemented.
 add_value(Timeseries, Value) -> 
-    file:write(Timeseries,  format_entry(erlang:now(), Value)).
+    Timeseries ! {write, erlang:now(), Value}.
 
 %% @doc Add a value to a timeseries.  Timestamp must be more recent than the
 %% last value already in the timeseries.
 -spec add_value(timeseries_descriptor(), ts_value(), timestamp()) -> ok | {error, term()}.
-add_value(Timeseries, Value, Timestamp) ->
-    file:write(Timeseries,  format_entry(Timestamp, Value)).
+add_value(Timeseries, Timestamp, Value) ->
+    Timeseries ! {write, Timestamp, Value}.
 
 %% @doc Retrives all values from a timeseries in interval, including
 %% From and To.
@@ -52,8 +52,27 @@ get_values(_Timeseries, _From, _To) ->
 format_entry(Time, Value)  -> 
     lists:flatten(io_lib:format("~p ~p~n", [Time, Value])).
 
-parse_entry_from_line(Line) ->
-    [MegaSecs, Secs, Microsecs, Value] = string:tokens(Line, "{} ,"),
-    {ok, {list_to_integer(MegaSecs),list_to_integer(Secs), list_to_integer(Microsecs)}, Value}.
+%% parse_entry_from_line(Line) ->
+%%     [MegaSecs, Secs, Microsecs, Value] = string:tokens(Line, "{} ,"),
+%%     {ok, {list_to_integer(MegaSecs),list_to_integer(Secs), list_to_integer(Microsecs)}, Value}.
 
-    
+
+is_newer(OldTime, NewTime) ->
+    NewTime > OldTime.
+
+start(Filename) ->
+    spawn(fun() -> loop(file:open(Filename, [append]), erlang:now()) end).
+
+loop(Device, OldTime) ->
+    receive
+	{write, NewTime, Value} ->
+	    case is_newer(OldTime, NewTime) of
+		true -> 
+		    file:write(Device, format_entry(NewTime, Value)),
+		    io:format("yes ~p ~p ~p ~n", [NewTime, Value, Device]),
+		    loop(Device, NewTime);
+		false -> 
+		    io:format("no~n"),
+		    loop(Device, OldTime)
+	    end
+    end.
