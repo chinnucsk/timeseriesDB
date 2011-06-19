@@ -61,15 +61,16 @@ is_newer(OldTime, NewTime) ->
     NewTime > OldTime.
 
 start(Filename) ->
-    spawn(fun() -> loop(file:open(Filename, [append]), erlang:now()) end).
+    spawn(fun() -> 
+		  {ok, Device} = file:open(Filename, [append]), 
+		  loop(Device, erlang:now()) end).
 
 loop(Device, OldTime) ->
     receive
 	{write, NewTime, Value} ->
 	    case is_newer(OldTime, NewTime) of
 		true -> 
-		    file:write(Device, format_entry(NewTime, Value)),
-		    io:format("yes ~p ~p ~p ~n", [NewTime, Value, Device]),
+		    ok = file:write(Device, format_entry(NewTime, Value)),
 		    loop(Device, NewTime);
 		false -> 
 		    io:format("no~n"),
