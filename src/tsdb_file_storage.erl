@@ -49,21 +49,14 @@ add_value(Timeseries, Timestamp, Value) ->
 get_values(_Timeseries, _From, _To) ->
    not_implemented.
 
-format_entry(Time, Value)  -> 
-    lists:flatten(io_lib:format("~p ~p~n", [Time, Value])).
-
-%% parse_entry_from_line(Line) ->
-%%     [MegaSecs, Secs, Microsecs, Value] = string:tokens(Line, "{} ,"),
-%%     {ok, {list_to_integer(MegaSecs),list_to_integer(Secs), list_to_integer(Microsecs)}, Value}.
-
-
-is_newer(OldTime, NewTime) ->
-    NewTime > OldTime.
-
 start(Filename) ->
     spawn(fun() -> 
-		  {ok, Device} = file:open(Filename, [append]), 
-		  loop(Device, erlang:now()) end).
+		  {ok, DeviceFindLast} = file:open(Filename, [raw, read]),
+		  LastEntry = get_last_line_from_file(DeviceFindLast),
+		  {ok, LastEntryTimeStamp, _} = parse_entry_from_line(LastEntry),
+		  {ok, Device} = file:open(Filename, [append]),
+		  loop(Device, LastEntryTimeStamp) 
+	  end).
 
 loop(Device, OldTime) ->
     receive
@@ -77,3 +70,29 @@ loop(Device, OldTime) ->
 		    loop(Device, OldTime)
 	    end
     end.
+
+
+
+%% Auxilliary functions
+%%
+
+get_last_line_from_file(Device) ->
+    get_last_line_from_file_acc(Device, "").
+
+get_last_line_from_file_acc(Device, Accum) ->
+    case file:read_line(Device) of
+	eof -> Accum;
+	{ok, Line} -> get_last_line_from_file_acc(Device, Line)
+    end.
+
+
+format_entry(Time, Value)  -> 
+    lists:flatten(io_lib:format("~p ~p~n", [Time, Value])).
+
+parse_entry_from_line(Line) ->
+    [MegaSecs, Secs, Microsecs, Value] = string:tokens(Line, "{} ,"),
+    {ok, {list_to_integer(MegaSecs),list_to_integer(Secs), list_to_integer(Microsecs)}, Value}.
+
+is_newer(OldTime, NewTime) ->
+    NewTime > OldTime.
+
