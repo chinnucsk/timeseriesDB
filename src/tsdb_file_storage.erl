@@ -53,6 +53,7 @@ start(Filename) ->
     spawn(fun() -> 
 		  {ok, DeviceFindLast} = file:open(Filename, [raw, read]),
 		  LastEntry = get_last_line_from_file(DeviceFindLast),
+		  ok = file:close(DeviceFindLast),
 		  {ok, LastEntryTimeStamp, _} = parse_entry_from_line(LastEntry),
 		  {ok, Device} = file:open(Filename, [append]),
 		  loop(Device, LastEntryTimeStamp) 
