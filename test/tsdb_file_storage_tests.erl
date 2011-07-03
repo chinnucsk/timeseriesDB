@@ -36,9 +36,9 @@ add_value_test_() ->
       "aha2.ts",
       fun(File) ->
 	      ?cmd("rm -f " ++ File),
-	      {Result, _Timeseries} = tsdb_file_storage:open_timeseries_file(File),
+	      {Result, Timeseries} = tsdb_file_storage:open_timeseries_file(File),
 	      ?assertMatch(ok, Result)
-%%	      ?assertMatch(ok, tsdb_file_storage:add_value(_Timeseries, erlang:now(), eto))
+	      ?assertMatch(ok, tsdb_file_storage:add_value(Timeseries, eto))
       end).
 
 get_values_test_() ->

@@ -29,7 +29,7 @@ open_timeseries_file(Filename) ->
 %% @doc Similar to add_value/3, but Timestamp defaults to now.
 %%
 %% @see add_value/3.
--spec add_value(timeseries_descriptor(), ts_value()) -> ok | {error, term()} | not_implemented.
+-spec add_value(timeseries_descriptor(), ts_value()) -> ok | {error, term()}.
 add_value(Timeseries, Value) -> 
     Timeseries ! {write, erlang:now(), Value}.
 
@@ -59,7 +59,7 @@ start(Filename) ->
 loop(Device, OldTime) ->
     receive
 	{write, NewTime, Value} ->
-	    case is_newer(OldTime, NewTime) of
+	    case (OldTime < NewTime) of
 		true -> 
 		    ok = file:write(Device, format_entry(NewTime, Value)),
 		    loop(Device, NewTime);
@@ -104,6 +104,4 @@ parse_entry_from_line(Line) ->
     [MegaSecs, Secs, Microsecs, Value] = string:tokens(Line, "{} ,"),
     {ok, {list_to_integer(MegaSecs),list_to_integer(Secs), list_to_integer(Microsecs)}, Value}.
 
-is_newer(OldTime, NewTime) ->
-    NewTime > OldTime.
 
