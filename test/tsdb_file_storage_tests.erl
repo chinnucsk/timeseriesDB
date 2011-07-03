@@ -11,6 +11,15 @@ open_timeseries_file_test_() ->
 	      ?cmd("rm " ++ File)
       end).
 
+%% delete file empty
+%% create new timeseries with file empty
+%% log a few things
+%% grep those things from the empty file.
+%% delete the file.
+
+%% 
+
+
 %% open_timeseries_file_fail_write_protected_test_() ->
 %%     with_tmp_file(
 %%       "write_protected.ts", 
@@ -22,15 +31,15 @@ open_timeseries_file_test_() ->
 %% 	      ?cmd("rm " ++ File)
 %%       end).
 
-%% add_value_test_() ->
-%%     with_tmp_file(
-%%       "aha2.ts",
-%%       fun(File) ->
-%% 	      ?cmd("touch " ++ File),
-%% 	      {Result, _Timeseries} = tsdb_file_storage:open_timeseries_file(File),
-%% 	      ?assertMatch(ok, Result),
-%% 	      ?assertMatch(ok, tsdb_file_storage:add_value(_Timeseries, eto))
-%%       end).
+add_value_test_() ->
+    with_tmp_file(
+      "aha2.ts",
+      fun(File) ->
+	      ?cmd("rm -f " ++ File),
+	      {Result, _Timeseries} = tsdb_file_storage:open_timeseries_file(File),
+	      ?assertMatch(ok, Result)
+%%	      ?assertMatch(ok, tsdb_file_storage:add_value(_Timeseries, erlang:now(), eto))
+      end).
 
 get_values_test_() ->
     with_tmp_file(

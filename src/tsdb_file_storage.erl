@@ -50,11 +50,8 @@ get_values(_Timeseries, _From, _To) ->
    not_implemented.
 
 start(Filename) ->
-    spawn(fun() -> 
-		  {ok, DeviceFindLast} = file:open(Filename, [raw, read]),
-		  LastEntry = get_last_line_from_file(DeviceFindLast),
-		  ok = file:close(DeviceFindLast),
-		  {ok, LastEntryTimeStamp, _} = parse_entry_from_line(LastEntry),
+    spawn(fun() ->
+		  {ok, LastEntryTimeStamp} = get_last_timestamp_from_file(Filename),
 		  {ok, Device} = file:open(Filename, [append]),
 		  loop(Device, LastEntryTimeStamp) 
 	  end).
@@ -77,6 +74,20 @@ loop(Device, OldTime) ->
 %% Auxilliary functions
 %%
 
+get_last_timestamp_from_file(Filename) ->
+    %% opening the file for write is a hack, it should just just check
+    %% if the file exists instead.
+    {ok, Device} = file:open(Filename, [raw, read, write]),
+    case get_last_line_from_file(Device) of
+	"" ->
+	    Result = {ok, erlang:now()};
+	Line -> 
+	    {ok, Entry, _} = parse_entry_from_line(Line), 
+	    Result = {ok, Entry}
+    end,
+    ok = file:close(Device), 
+    Result.
+
 get_last_line_from_file(Device) ->
     get_last_line_from_file_acc(Device, "").
 
@@ -85,7 +96,6 @@ get_last_line_from_file_acc(Device, Accum) ->
 	eof -> Accum;
 	{ok, Line} -> get_last_line_from_file_acc(Device, Line)
     end.
-
 
 format_entry(Time, Value)  -> 
     lists:flatten(io_lib:format("~p ~p~n", [Time, Value])).
