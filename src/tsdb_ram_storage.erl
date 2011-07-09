@@ -37,7 +37,7 @@
 
 -spec start_link(Name :: atom()) -> {ok, Pid :: pid()} | ignore | {error, Error :: any()}.
 start_link(Name) ->
-    gen_server:start_link(?MODULE, [Name], []).
+    gen_server:start_link({local, Name}, ?MODULE, [Name], []).
 
 stop(Name) ->
     gen_server:call(Name, stop).

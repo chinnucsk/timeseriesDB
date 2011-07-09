@@ -15,7 +15,9 @@ ensure_started(App) ->
     end.
 
 start() ->
+    ensure_started(sasl),
     ensure_started(crypto),
+    ensure_started(os_mon),
     application:start(timeseriesDB).
 
 stop() ->

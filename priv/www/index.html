@@ -3,15 +3,18 @@
     <title>timeseriesDB</title>
   </head>
   <body>
-    <script type="text/javascript" src="jquery-1.4.4.min.js"></script>
+    <script type="text/javascript" src="jquery-1.6.2.min.js"></script>
+    <script language="javascript" type="text/javascript" src="flot/jquery.flot.js"></script>
+    <script language="javascript" type="text/javascript" src="flot/jquery.flot.selection.js"></script> 
     <script type="text/javascript" src="tsdb.js"></script>
+
     <link rel="stylesheet" type="text/css" href="tsdb.css" />
 
     <script type="text/javascript"> $(document).ready(function() { tsdb.run(); }); </script>
 
     <h1>timeseriesDB - The new cool NoSQL in town.</h1>
 
-    <div id=canvas </div>
+    <div id="canvas" style="width:600px;height:300px;"></div>
 
   </body>
 </html>

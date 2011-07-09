@@ -10,7 +10,8 @@
 
 %% API
 -export([start_link/1,
-	 stop/1
+	 stop/1,
+	 tick/1
 	]).
 
 %% gen_server callbacks
@@ -24,15 +25,17 @@
 %%%===================================================================
 
 start_link(Name) ->
-    gen_server:start_link(?MODULE, [Name], []).
+    gen_server:start_link({local, Name}, ?MODULE, [Name], []).
 
 stop(Name) ->
     gen_server:call(Name, stop).
 
 init([_Name]) ->
-    io:format("nteohu"),
+    timer:send_interval(5000, tick),
     {ok, #state{}}.
 
+tick(Name) ->
+    gen_server:cast(Name, tick).
 
 %%--------------------------------------------------------------------
 %% @private
@@ -62,6 +65,9 @@ handle_call(Request, From, State) ->
 %%                                  {stop, Reason, State}
 %% @end
 %%--------------------------------------------------------------------
+handle_cast(tick, State) ->
+    tsdb_ram_storage:append_value(nprocs_ts, cpu_sup:nprocs()),
+    {noreply, State};
 handle_cast(Msg, State) ->
     {stop, {error, {unknown_cast, Msg}}, State}.
 
@@ -75,6 +81,9 @@ handle_cast(Msg, State) ->
 %%                                   {stop, Reason, State}
 %% @end
 %%--------------------------------------------------------------------
+handle_info(tick, State) ->
+    tsdb_ram_storage:append_value(nprocs_ts, cpu_sup:nprocs()),
+    {noreply, State};
 handle_info(Info, State) ->
     {stop, {error, {unknown_info, Info}}, State}.
 
