@@ -8,7 +8,8 @@
 	     tsdb_sup,
 	     tsdb_web,
 	     tsdb_file_storage,
-	     tsdb_ram_storage
+	     tsdb_ram_storage,
+	     tsdb_os_mon
 	    ]},
   {registered, []},
   {mod, {'tsdb_app', []}},

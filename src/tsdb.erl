@@ -4,7 +4,7 @@
 
 -module(tsdb).
 
--export([start/0, stop/0, foo/0]).
+-export([start/0, stop/0]).
 
 ensure_started(App) ->
     case application:start(App) of
@@ -20,9 +20,3 @@ start() ->
 
 stop() ->
     application:stop(timeseriesDB).
-
-%% @doc Function uses for testing the devopment setup.  Will be
-%% removed when we get some real tests.
--spec foo() -> 42.
-foo() ->
-    42.

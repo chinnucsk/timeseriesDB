@@ -6,4 +6,4 @@ cd ..
 LIB_DIR=`pwd`
 
 echo "erl -pa $PWD/ebin -boot start_sasl -s tsdb"-
-erl -pa $LIB_DIR/timeseriesDB/ebin -pa $LIB_DIR/proper/ebin -boot start_sasl
+erl -pa $LIB_DIR/timeseriesDB/ebin -pa $LIB_DIR/proper/ebin -boot start_sasl -sname tsdb
