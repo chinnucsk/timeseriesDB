@@ -46,9 +46,10 @@ get_values_test_() ->
       "aha3.ts",
       fun(File) ->
 	      ?cmd("touch " ++ File),
-	      ?assertMatch(not_implemented, tsdb_file_storage:get_values("foo", oetn, ste))
+	      {Result, Timeseries} = tsdb_file_storage:open_timeseries_file(File),
+	      ?assertMatch(ok, Result),
+	      ?assertMatch({ok, []}, tsdb_file_storage:get_values(Timeseries, oetn, ste))
       end).
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%  Helper functions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
