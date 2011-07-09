@@ -50,29 +50,62 @@ add_value(Timeseries, Timestamp, Value) ->
 		 timestamp() | last_entry) ->
 			timeseries() |
 			{error, term()}.
-get_values(_Timeseries, _From, _To) ->
-   not_implemented.
+get_values(Timeseries, From, To) ->
+    flush(),
+    Timeseries ! {get, self(), From, To},
+    receive
+	{ok, Results} -> {ok, Results}
+    after 2000 -> {error, timeout}
+    end.
+
+flush() ->
+    receive
+	{ok, R} -> {ok,R}
+    after 0 -> ok
+    end.
+	    
+
 
 start(Filename) ->
     spawn(fun() ->
 		  {ok, LastEntryTimeStamp} = get_last_timestamp_from_file(Filename),
 		  {ok, Device} = file:open(Filename, [append]),
-		  loop(Device, LastEntryTimeStamp) 
+		  loop(Filename, Device, LastEntryTimeStamp) 
 	  end).
 
-loop(Device, OldTime) ->
+loop(Filename, Device, OldTime) ->
     receive
 	{write, NewTime, Value} ->
 	    case (OldTime < NewTime) of
 		true -> 
 		    ok = file:write(Device, format_entry(NewTime, Value)),
-		    loop(Device, NewTime);
+		    loop(Filename, Device, NewTime);
 		false -> 
-		    loop(Device, OldTime)
-	    end
+		    loop(Filename, Device, OldTime)
+	    end;
+	{get, Pid, From, To} ->
+	    Pid ! {ok, handle_get(Filename, From, To)},
+	    loop(Filename, Device, OldTime)
     end.
 
+handle_get(Filename, From, To) ->
+    {ok, ReadDevice} = file:open(Filename, [read]),
+    extract_from_file_result(ReadDevice, From, To, []).
 
+extract_from_file_result(Device, From, To, Result) ->
+    case file:read_line(Device) of
+	eof -> Result;
+	{ok, Line} -> 
+	    {ok, Entry, Value} =
+		parse_entry_from_line(Line),
+
+	    case From =< Entry andalso To >= Entry of
+		true -> 
+		    extract_from_file_result(Device, From, To, [{Entry, Value}|Result]);
+		false ->
+		    extract_from_file_result(Device, From, To, Result)
+	    end
+    end.
 
 %% Auxilliary functions
 %%
