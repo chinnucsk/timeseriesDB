@@ -37,7 +37,7 @@ add_value_test_() ->
       fun(File) ->
 	      ?cmd("rm -f " ++ File),
 	      {Result, Timeseries} = tsdb_file_storage:open_timeseries_file(File),
-	      ?assertMatch(ok, Result)
+	      ?assertMatch(ok, Result),
 	      ?assertMatch(ok, tsdb_file_storage:add_value(Timeseries, eto))
       end).
 

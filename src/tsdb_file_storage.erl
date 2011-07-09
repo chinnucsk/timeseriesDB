@@ -1,3 +1,4 @@
+
 %% @author Peter Mechlenborg <peter.mechlenborg@gmail.com>
 %% @author Lars Hesel Christensen <larshesel@gmail.com>
 %%
@@ -31,13 +32,16 @@ open_timeseries_file(Filename) ->
 %% @see add_value/3.
 -spec add_value(timeseries_descriptor(), ts_value()) -> ok | {error, term()}.
 add_value(Timeseries, Value) -> 
-    Timeseries ! {write, erlang:now(), Value}.
+    Timeseries ! {write, erlang:now(), Value},
+    ok.
+
 
 %% @doc Add a value to a timeseries.  Timestamp must be more recent than the
 %% last value already in the timeseries.
 -spec add_value(timeseries_descriptor(), ts_value(), timestamp()) -> ok | {error, term()}.
 add_value(Timeseries, Timestamp, Value) ->
-    Timeseries ! {write, Timestamp, Value}.
+    Timeseries ! {write, Timestamp, Value},
+    ok.
 
 %% @doc Retrives all values from a timeseries in interval, including
 %% From and To.
@@ -64,7 +68,6 @@ loop(Device, OldTime) ->
 		    ok = file:write(Device, format_entry(NewTime, Value)),
 		    loop(Device, NewTime);
 		false -> 
-		    io:format("no~n"),
 		    loop(Device, OldTime)
 	    end
     end.
@@ -80,7 +83,7 @@ get_last_timestamp_from_file(Filename) ->
     {ok, Device} = file:open(Filename, [raw, read, write]),
     case get_last_line_from_file(Device) of
 	"" ->
-	    Result = {ok, erlang:now()};
+	    Result = {ok, {0,0,0}};
 	Line -> 
 	    {ok, Entry, _} = parse_entry_from_line(Line), 
 	    Result = {ok, Entry}
