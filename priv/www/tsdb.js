@@ -34,7 +34,7 @@ tsdb.run = function(){
 			      function (event, ranges) {
 				  var newOptions = $.extend(true, {}, options, {
 								xaxis: { min: ranges.xaxis.from,
-									 max: ranges.xaxis.to,},
+									 max: ranges.xaxis.to },
 								yaxis: { min: ranges.yaxis.from,
 									 max: ranges.yaxis.to }
 							    });
