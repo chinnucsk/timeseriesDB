@@ -7,7 +7,7 @@ open_timeseries_file_test_() ->
       "aha1.ts",
       fun(File) ->
 	      ?cmd("touch " ++ File),
-	      ?assertMatch({ok,_}, tsdb_file_storage:open_timeseries_file(File)),
+	      ?assertMatch({ok,_}, tsdb_file_storage:start_link(File)),
 	      ?cmd("rm " ++ File)
       end).
 
@@ -36,9 +36,9 @@ add_value_test_() ->
       "aha2.ts",
       fun(File) ->
 	      ?cmd("rm -f " ++ File),
-	      {Result, Timeseries} = tsdb_file_storage:open_timeseries_file(File),
+	      {Result, Timeseries} = tsdb_file_storage:start_link(File),
 	      ?assertMatch(ok, Result),
-	      ?assertMatch(ok, tsdb_file_storage:add_value(Timeseries, eto))
+	      ?assertMatch(ok, tsdb_file_storage:append_value(Timeseries, eto))
       end).
 
 get_values_test_() ->
@@ -46,7 +46,7 @@ get_values_test_() ->
       "aha3.ts",
       fun(File) ->
 	      ?cmd("touch " ++ File),
-	      {Result, Timeseries} = tsdb_file_storage:open_timeseries_file(File),
+	      {Result, Timeseries} = tsdb_file_storage:start_link(File),
 	      ?assertMatch(ok, Result),
 	      ?assertMatch({ok, []}, tsdb_file_storage:get_values(Timeseries, oetn, ste))
       end).

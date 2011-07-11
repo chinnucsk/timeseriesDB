@@ -9,37 +9,42 @@
 
 
 -module(tsdb_file_storage).
--export([open_timeseries_file/1,
-	 add_value/2,
-	 add_value/3,
+-export([start_link/1, 
+	 append_value/2,
+	 append_value/3,
 	 get_values/3]).
 
--type filename() :: string().
 -type timeseries_descriptor() :: term().
 -type ts_value() :: float().
 -type timestamp() :: {integer(), integer(), integer()}.
 -type timeseries() :: [{timestamp(), ts_value()}].
 
-%% @doc Opens or creates a timeseries.  If file exists it is opened so
-%% more data can be appended to the timeseries.  If the file does not
-%% exist, it is created and opened.
--spec open_timeseries_file(filename()) -> timeseries_descriptor().
-open_timeseries_file(Filename) -> 
-    {ok, start(Filename)}.
+
+-spec start_link(Name :: atom()) -> {ok, Pid :: pid()} | ignore | {error, Error :: any()}.
+start_link(Timeseries) ->
+    Pid = spawn(fun() ->
+		  {ok, LastEntryTimeStamp} = get_last_timestamp_from_file(Timeseries),
+		  {ok, Device} = file:open(Timeseries, [append]),
+		  loop(Timeseries, Device, LastEntryTimeStamp) 
+		end),
+    Pid,
+    true = erlang:register(list_to_atom(Timeseries), Pid),
+    {ok, Pid}.
+    
 
 %% @doc Similar to add_value/3, but Timestamp defaults to now.
 %%
 %% @see add_value/3.
--spec add_value(timeseries_descriptor(), ts_value()) -> ok | {error, term()}.
-add_value(Timeseries, Value) -> 
+-spec append_value(timeseries_descriptor(), ts_value()) -> ok | {error, term()}.
+append_value(Timeseries, Value) -> 
     Timeseries ! {write, erlang:now(), Value},
     ok.
 
 
 %% @doc Add a value to a timeseries.  Timestamp must be more recent than the
 %% last value already in the timeseries.
--spec add_value(timeseries_descriptor(), ts_value(), timestamp()) -> ok | {error, term()}.
-add_value(Timeseries, Timestamp, Value) ->
+-spec append_value(timeseries_descriptor(), ts_value(), timestamp()) -> ok | {error, term()}.
+append_value(Timeseries, Value, Timestamp) ->
     Timeseries ! {write, Timestamp, Value},
     ok.
 
@@ -54,24 +59,9 @@ get_values(Timeseries, From, To) ->
     flush(),
     Timeseries ! {get, self(), From, To},
     receive
-	{ok, Results} -> {ok, Results}
+    	{ok, Results} -> {ok, Results}
     after 2000 -> {error, timeout}
     end.
-
-flush() ->
-    receive
-	{ok, R} -> {ok,R}
-    after 0 -> ok
-    end.
-	    
-
-
-start(Filename) ->
-    spawn(fun() ->
-		  {ok, LastEntryTimeStamp} = get_last_timestamp_from_file(Filename),
-		  {ok, Device} = file:open(Filename, [append]),
-		  loop(Filename, Device, LastEntryTimeStamp) 
-	  end).
 
 loop(Filename, Device, OldTime) ->
     receive
@@ -94,14 +84,15 @@ handle_get(Filename, From, To) ->
 
 extract_from_file_result(Device, From, To, Result) ->
     case file:read_line(Device) of
-	eof -> Result;
+	eof -> lists:reverse(Result);
 	{ok, Line} -> 
 	    {ok, Entry, Value} =
 		parse_entry_from_line(Line),
+	    {IntValue, _} = string:to_integer(Value),
 
-	    case From =< Entry andalso To >= Entry of
+	    case true of %From =< Entry andalso To >= Entry of
 		true -> 
-		    extract_from_file_result(Device, From, To, [{Entry, Value}|Result]);
+		    extract_from_file_result(Device, From, To, [{Entry, IntValue}|Result]);
 		false ->
 		    extract_from_file_result(Device, From, To, Result)
 	    end
@@ -109,6 +100,12 @@ extract_from_file_result(Device, From, To, Result) ->
 
 %% Auxilliary functions
 %%
+
+flush() ->
+    receive
+	{ok, R} -> {ok,R}
+    after 0 -> ok
+    end.
 
 get_last_timestamp_from_file(Filename) ->
     %% opening the file for write is a hack, it should just just check
