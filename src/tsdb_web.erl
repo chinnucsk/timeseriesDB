@@ -48,7 +48,7 @@ loop(Req, DocRoot) ->
                       {path, Path},
                       {type, Type}, {what, What},
                       {trace, erlang:get_stacktrace()}],
-            error_logger_msg:error_report(Report),
+            error_logger:error_report(Report),
             %% NOTE: mustache templates need \ because they are not awesome.
             Req:respond({500, [{"Content-Type", "text/plain"}],
                          "request failed, sorry\n"})
@@ -60,7 +60,7 @@ get_option(Option, Options) ->
     {proplists:get_value(Option, Options), proplists:delete(Option, Options)}.
 
 ts_to_json() ->
-    {ok, Values} = tsdb_ram_storage:get_values(nprocs_ts, first_entry, last_entry),
+    {ok, Values} = tsdb_file_storage:get_values(nprocs_ts, first_entry, last_entry),
     Foo = lists:map(fun({Now = {_, _, Micro}, V}) ->
 			    {_Date = {D1,D2,D3}, _Time = {T1,T2,T3}} = calendar:now_to_datetime(Now),
 			    {struct, [{<<"ts">>, [D1,D2,D3,T1,T2,T3,Micro]},

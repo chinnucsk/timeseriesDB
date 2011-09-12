@@ -66,7 +66,7 @@ handle_call(Request, From, State) ->
 %% @end
 %%--------------------------------------------------------------------
 handle_cast(tick, State) ->
-    tsdb_ram_storage:append_value(nprocs_ts, cpu_sup:nprocs()),
+    tsdb_file_storage:append_value(nprocs_ts, cpu_sup:nprocs()),
     {noreply, State};
 handle_cast(Msg, State) ->
     {stop, {error, {unknown_cast, Msg}}, State}.
@@ -82,7 +82,7 @@ handle_cast(Msg, State) ->
 %% @end
 %%--------------------------------------------------------------------
 handle_info(tick, State) ->
-    tsdb_ram_storage:append_value(nprocs_ts, cpu_sup:nprocs()),
+    tsdb_file_storage:append_value(nprocs_ts, cpu_sup:nprocs()),
     {noreply, State};
 handle_info(Info, State) ->
     {stop, {error, {unknown_info, Info}}, State}.

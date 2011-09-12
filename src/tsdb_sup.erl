@@ -34,8 +34,8 @@ tsdb_os_mon() ->
     {ModName, Mfa, permanent, 5000, worker, dynamic}.
 
 nprocs_ts() ->
-    Cfg = [nprocs_ts],
-    Mfa = {tsdb_ram_storage, start_link, Cfg},
+    Cfg = ["nprocs_ts"],
+    Mfa = {tsdb_file_storage, start_link, Cfg},
     ModName = nprocs_ts,
     {ModName, Mfa, permanent, 5000, worker, dynamic}.
 
